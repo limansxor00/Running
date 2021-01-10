@@ -8,53 +8,65 @@ namespace Gamekit2D
 {
     public class RunningGameManager : MonoBehaviour 
     {
+        // 싱글톤 패턴일 경우 
         //public static RunningGameManager Instance
         //{
         //    get { return _Instance; }
         //}
         //protected static RunningGameManager _Instance;
 
-        GameObject Player;
 
-        public InputComponent.InputButton Jump = new InputComponent.InputButton(KeyCode.Space, InputComponent.XboxControllerButtons.A);
-        public InputComponent.InputAxis Horizontal = new InputComponent.InputAxis(KeyCode.D, KeyCode.A, InputComponent.XboxControllerAxes.LeftstickHorizontal);
+        // 뷰잉 목적인지 인풋 목적인지 잘 구분 해야 할듯 
 
-        public bool isRunningStart = false;
-
+        // == 설정값 ==
+        [Header("=== 특별한 옵션 ===")]
+        [Header("움직임 추적")]
+        public bool isMotionTracking = false; // 특별 옵션
+        [Header("비트코인 시세 알아보기")]
+        public bool isBitCoinEnable = false; // 특별 옵션
+        [Header("오브젝트 등록")]
         public Text UIScore;
         public Text UIBest_Score;
-
-        public GameObject effect1;
-
         public GameObject CreateCoinPos;
         public Transform CoinParent;
+        public GameObject effect1;
+        // == 감시하는 값 == 
+        [Header("감시하는 값")]
+        [SerializeField]
+        private bool isRunningStart = false;
+        // == 내부 변수 ==
+        
+       
+      
 
-        public bool isMotionTracking = false; // 특별 옵션
-        public bool isBitCoinEnable = false; // 특별 옵ㅅ
-
-        private int Score;
-
+        //상태 관련 
         private bool isScoreUpEnable = false;
-
-        float tradePrice;
 
         private bool isJump = false;
         private bool isDoubleJumpEnable = false;
         private bool isDoubleJump = false;
         private bool isUpTouch = true;
 
-   
-
-       // PlayerCharacter playerCharacter;
-
-        CharacterAddSensing characterAddSensing;
+        private bool isTouch = true;
+        // 비트 코인 시세 
+        private float tradePrice;
+        //점수
+        private int Score;
         CoinAPILoading coinAPILoading;
+
+        //치환 목적 변수
+        // PlayerCharacter playerCharacter;
+        private GameObject Player;
+        CharacterAddSensing characterAddSensing;
+       
+
         private void Awake()
         {
+            // 싱글톤 용
             //if (_Instance == null)
             //    _Instance = this;
             
-            Player = GameObject.Find("cat");
+            Player = GameObject.Find("cat"); // 여기서 고양이 오브젝트를 플레이어 
             characterAddSensing = Player.GetComponent<CharacterAddSensing>();
 
          //   playerCharacter = Player.GetComponent<PlayerCharacter>();
@@ -62,30 +74,31 @@ namespace Gamekit2D
         // Start is called before the first frame update
         IEnumerator Start()
         {
-
             UIScore.text = "0";
             isRunningStart = false;
             // 여기서 API 불러 와보자 
              coinAPILoading = new CoinAPILoading();
+
             if( isBitCoinEnable)
             yield return StartCoroutine(coinAPILoading.HttpHeaderGet());
-            yield return new WaitForSeconds(0.1f);
 
-            GetComponent<GoogleAdMobController>().RequestAndLoadRewardedInterstitialAd(); // 광고 넣기 
+            GetComponent<GoogleAdMobController>().RequestAndLoadRewardedInterstitialAd(); // 광고 넣기 준비
 
-            UIBest_Score.text = GetComponent<SQLCon>().configs[1].record; // 기록 불러 오기 
-            yield return new WaitForSeconds(0.9f);
+            yield return new WaitForSeconds(0.05f); 
+            UIBest_Score.text = GetComponent<SQLCon>().configs[1].record; // 기록 불러 오기 디비 관련 
+            yield return new WaitForSeconds(0.95f);
+
             isRunningStart = true;
+
             if (characterAddSensing.Sensing == 0)
                 isScoreUpEnable = true;
             if(isMotionTracking )
             StartCoroutine(CoinPosAutoCreate());
 
-           
             yield break;
         }
 
-        IEnumerator CoinPosAutoCreate()
+        IEnumerator CoinPosAutoCreate() // 궤적 에 아이템 넣기 
         {
             while(true)
             {
@@ -95,58 +108,56 @@ namespace Gamekit2D
             yield break;
         }
 
-        bool isTouch = true;
-
-      
         // Update is called once per frame
         void Update()
         {
-            
-            if (characterAddSensing.Sensing == 0)
-                isScoreUpEnable = true;
-            else if (isScoreUpEnable && characterAddSensing.Sensing ==1)
+            switch (characterAddSensing.Sensing)
             {
-                Score++;
-                if (isBitCoinEnable)
-                {
-                    tradePrice = float.Parse(coinAPILoading.upbit_BitCoin.tradePrice);
-                }
-                else
-                {
-                    tradePrice = 1;
-                }
-               // Debug.Log("비트코인 가격" + coinAPILoading.upbit_BitCoin.tradePrice);
-                UIScore.text = (Score* tradePrice).ToString("###,###");
-                GetComponent<AudioSource>().Play();
-                Instantiate(effect1, characterAddSensing.preObjPos, Quaternion.identity);
-                isScoreUpEnable = false;
+                case 0:
+                    isScoreUpEnable = true;
+                    break;
+                case 1:
+                    Score++;
+
+                    if (isBitCoinEnable)
+                    {
+                        tradePrice = float.Parse(coinAPILoading.upbit_BitCoin.tradePrice);
+                    }
+                    else
+                    {
+                        tradePrice = 1;
+                    }
+                    // Debug.Log("비트코인 가격" + coinAPILoading.upbit_BitCoin.tradePrice);
+                    UIScore.text = (Score * tradePrice).ToString("###,###");
+                    GetComponent<AudioSource>().Play();
+                    Instantiate(effect1, characterAddSensing.preObjPos, Quaternion.identity);
+                    isScoreUpEnable = false;
+                    break;
+                case 2:
+                    if (Score > int.Parse(UIBest_Score.text))
+                    {
+                        GetComponent<SQLCon>().DataBaseUpdate(Score);
+                    }
+                    characterAddSensing.Sensing = 0;
+                    GetComponent<GoogleAdMobController>().ShowRewardedInterstitialAd(); // 광고 넣기
+                    break;
+                default:
+                    break;
             }
-
-            if(characterAddSensing.isEndPoint)
-            {
-                if (Score > int.Parse(UIBest_Score.text))
-                {
-                    GetComponent<SQLCon>().DataBaseUpdate(Score);
-                }
-
-                GetComponent<GoogleAdMobController>().ShowRewardedInterstitialAd(); // 광고 넣기
-                characterAddSensing.isEndPoint = false;
-            }
-
-
-            if (Player.transform.position.y < -3f)
-            {
-                if (Score > int.Parse(UIBest_Score.text))
-                {
-                    GetComponent<SQLCon>().DataBaseUpdate(Score);
-                }
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            }
+  
+        
 
             if (isRunningStart)
             {
 
-
+                if (characterAddSensing.isFailure) // 게임 실패 조건 
+                {
+                    if (Score > int.Parse(UIBest_Score.text))
+                    {
+                        GetComponent<SQLCon>().DataBaseUpdate(Score);
+                    }
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                }
                 if (characterAddSensing.IsGrounded) // 땅에 닿은거 확ㅇ
                 {
                     isJump = false;
@@ -197,14 +208,7 @@ namespace Gamekit2D
                         isUpTouch = true;
                     }
                 }
-
-               
             }
-
-            
-
-
-        
         }
 
 

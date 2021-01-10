@@ -8,25 +8,25 @@ namespace Gamekit2D
 {
     public class CharacterAddSensing : MonoBehaviour
     {
-
-        GameObject obj = null;
-        public int Sensing = 0;
+        
+        public int Sensing = 0; 
         public Vector2 preObjPos;
-        public bool IsGrounded =false ;
-
-        public bool isEndPoint = false; 
-
+        
+        public bool IsGrounded = false;
+        public bool isFailure = false;
         public AudioClip clip;
-
         public float gravity = 50f;
+
         protected const float k_GroundedStickingVelocityMultiplier = 5f;
 
-        Vector2 _MoveVector;
-        Animator _Animator;
+        // public bool isEndPoint = false; 
+        // 설정 값
+        private int GroundedLayerNumber = 31;     // 레이어 번호 
+        private GameObject obj = null;
+        private Vector2 _MoveVector;
+        private Animator _Animator;
+        private CharacterController2D _CharacterController2D;
 
-        CharacterController2D _CharacterController2D;
-
-       
         private void Awake()
         {
             _CharacterController2D = GetComponent<CharacterController2D>();
@@ -40,14 +40,14 @@ namespace Gamekit2D
         private void OnCollisionEnter2D(Collision2D collision)
         {
             //Debug.Log("collision.gameObject.layer" + collision.gameObject.layer);
-            if (collision.gameObject.layer == 31)
+            if (collision.gameObject.layer == GroundedLayerNumber)
             {
                 IsGrounded = true;
             }
         }
         private void OnCollisionExit2D(Collision2D collision)
         {
-            if (collision.gameObject.layer == 31)
+            if (collision.gameObject.layer == GroundedLayerNumber)
             {
                 IsGrounded = false;
             }
@@ -55,17 +55,16 @@ namespace Gamekit2D
         }
 
         void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other != null && other.GetComponent<ScoreCoin>() != null)
+        {      
+            if (other.GetComponent<ScoreCoin>() != null)
             {
                 obj = other.gameObject;
                 preObjPos = obj.transform.position;
                 Sensing = 1;
             }
-
-            if(other.name =="endPoint")
+            else if(other.name =="endPoint")
             {
-                isEndPoint = true;
+                Sensing = 2;
             }
             
 
@@ -81,10 +80,7 @@ namespace Gamekit2D
 
                 obj = null;
             }
-            if (other.name == "endPoint")
-            {
-                isEndPoint = false;
-            }
+           
         }
 
         public void SetHorizontalMovement(float newHorizontalMovement)
@@ -99,7 +95,10 @@ namespace Gamekit2D
 
         private void Update()
         {
-           
+            if (transform.position.y < -3f)
+            {
+                isFailure = true;
+            }
         }
 
         void FixedUpdate()

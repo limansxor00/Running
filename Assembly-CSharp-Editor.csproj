@@ -757,19 +757,37 @@
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.CacheServer">
+      <HintPath>Library\ScriptAssemblies\UnityEditor.CacheServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>Library\ScriptAssemblies\Unity.ResourceManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Addressables.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.Addressables.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>Library\ScriptAssemblies\Unity.Addressables.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline">
+      <HintPath>Library\ScriptAssemblies\Unity.ScriptableBuildPipeline.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
       <Project>{B2EA9F77-4955-236C-6129-FF858F727ECF}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="GoogleMobileAds.Editor.csproj">
-      <Project>{16E87226-26CB-DFD7-E580-36F83F48CC1B}</Project>
-      <Name>GoogleMobileAds.Editor</Name>
-    </ProjectReference>
     <ProjectReference Include="GoogleMobileAds.csproj">
       <Project>{98402F45-D00B-B5BB-BE5C-54C629F8F943}</Project>
       <Name>GoogleMobileAds</Name>
+    </ProjectReference>
+    <ProjectReference Include="GoogleMobileAds.Editor.csproj">
+      <Project>{16E87226-26CB-DFD7-E580-36F83F48CC1B}</Project>
+      <Name>GoogleMobileAds.Editor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
