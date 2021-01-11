@@ -1,0 +1,14 @@
+﻿<Properties StartupConfiguration="{D251FC30-D15F-D967-7FDF-5B7BBCCD21BF}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/2DGamekit/Utilities/Editor/RuleTileEditor.cs">
+    <Files>
+      <File FileName="Assets/2DGamekit/Utilities/Editor/RuleTileEditor.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="2af6d424-5523-4ea6-91a8-ec0b5ec84096" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
